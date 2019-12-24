@@ -115,6 +115,31 @@ class WS2811 {
   void setPixel(size_t index, uint8_t red, uint8_t green, uint8_t blue);
 
   /**
+   * @brief Get the colour of an individual pixel. The colour is returned via 
+   * the red, green, and blue pointers.
+   * 
+   * @param index position on the string, zero-indexed.
+   * @param red pointer to red value 0-255.
+   * @param green pointer to green value 0-255.
+   * @param blue pointer to blue value 0-255.
+   */
+  void getPixel(size_t index, uint8_t* red, uint8_t* green, uint8_t* blue);
+
+  /**
+   * @brief Shift all pixel values up by one. This means the value of the pixel 
+   * in index 2 is moved to index 3, the value in index 1 is moved to index 2 etc.
+   * Pixel index 0 is set to 0,0,0 - i.e. off.
+   */
+  void shiftUp(void);
+
+  /**
+   * @brief Shift all pixel values down by one. This means the value of the pixel 
+   * in index 2 is moved to index 1, the value in index 3 is moved to index 2 etc.
+   * Pixel index _numLeds-1 (the last pixel) is set to 0,0,0 - i.e. off.
+   */
+  void shiftDown(void);
+
+  /**
    * @brief Turn off all leds on this string.
    */
   void clearAll();

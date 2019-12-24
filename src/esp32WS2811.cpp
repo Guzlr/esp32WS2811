@@ -55,7 +55,7 @@ WS2811::WS2811(int dataPin, size_t numLeds, int channel) :
   _dataPin(dataPin),
   _numLeds(numLeds),
   _leds(nullptr),
-  _brightness(255),
+  _brightness(100),
   _effect(nullptr) {
     _leds = new Led[_numLeds];
   }
@@ -90,6 +90,41 @@ void WS2811::setPixel(size_t index, uint8_t red, uint8_t green, uint8_t blue) {
   } else {
     log_e("could not set pixel");
   }
+}
+
+void WS2811::getPixel(size_t index, uint8_t* red, uint8_t* green, uint8_t* blue) {
+  if (xSemaphoreTake(_smphr, 100) == pdTRUE) {
+    *red = _leds[index].red * 100 / _brightness;
+    *green = _leds[index].green * 100 / _brightness;
+    *blue = _leds[index].blue * 100 / _brightness;
+    xSemaphoreGive(_smphr);
+  } else {
+    log_e("could not get pixel");
+  }
+}
+
+void WS2811::shiftUp(void) {
+  if (xSemaphoreTake(_smphr, 100) == pdTRUE) {
+    for (size_t i=_numLeds-1; i>0; i--) {
+      _leds[i] = _leds[i-1];
+    }
+    xSemaphoreGive(_smphr);
+  } else {
+    log_e("could not shift pixels");
+  }
+  setPixel(0, 0, 0, 0);
+}
+
+void WS2811::shiftDown(void) {
+  if (xSemaphoreTake(_smphr, 100) == pdTRUE) {
+    for (size_t i=0; i<_numLeds-1; i++) {
+      _leds[i] = _leds[i+1];
+    }
+    xSemaphoreGive(_smphr);
+  } else {
+    log_e("could not shift pixels");
+  }
+  setPixel(_numLeds-1, 0, 0, 0);
 }
 
 void WS2811::clearAll() {
